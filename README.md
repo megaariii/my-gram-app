@@ -1,4 +1,3 @@
-
 # My Gram App
 
 Backend API for for Hacktiv8 Final Project
@@ -8,7 +7,7 @@ Backend API for for Hacktiv8 Final Project
 - [x] Register
 - [x] Login
 - [x] Edit user
-- [x] Delete customer
+- [x] Delete user
 - [x] Create photo
 - [x] Get all photos
 - [x] Get photo by user Id
@@ -28,7 +27,6 @@ Backend API for for Hacktiv8 Final Project
 
 Below we describe how to start this project
 
-
 ### Environment Variables
 
 To run this project, you will need to add the following environment variables to your .env file or use the .env.example file
@@ -41,12 +39,12 @@ To run this project, you will need to add the following environment variables to
 `DB_NAME`
 `SECRET_KEY`
 
-
 ### Installation
 
 You must download and install `Go`, follow [this instruction](https://golang.org/doc/install) to install.
 
 After Golang installed, Follow this instructions
+
 ```bash
 #move to directory
 $ cd workspace
@@ -62,8 +60,7 @@ $ go run main.go
 ```
 
 Go to `http://localhost:8080/` to [start this application.](http://localhost:8080/)
-    
+
 ## Feedback
 
 If you have any feedback, please reach out at mega.ari186@gmail.com
-
