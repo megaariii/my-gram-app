@@ -1,7 +1,7 @@
 
 # My Gram App
 
-An backend API for for Hacktiv8 Final Project
+Backend API for for Hacktiv8 Final Project
 
 ## Features
 
