@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"my-gram/model/domain"
+	"time"
 )
 
 type CommentRepositoryImpl struct {
@@ -15,8 +16,8 @@ func NewCommentRepository() CommentRepository {
 }
 
 func (cr *CommentRepositoryImpl) AddComment(ctx context.Context, tx *sql.Tx, id string, comment domain.Comment) (*domain.Comment, error) {
-	SQL := "INSERT INTO comments(message, photo_id, user_id, created_at) VALUES ($1, $2, $3, now())"
-	_, errInsert := tx.ExecContext(ctx, SQL, comment.Message, comment.PhotoID, id)
+	SQL := "INSERT INTO comments(message, photo_id, user_id, created_at) VALUES ($1, $2, $3, $4)"
+	_, errInsert := tx.ExecContext(ctx, SQL, comment.Message, comment.PhotoID, id, time.Now())
 
 	if errInsert != nil {
 		fmt.Println("Query Add Comment Repository Error: " + errInsert.Error())

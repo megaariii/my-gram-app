@@ -22,12 +22,10 @@ func NewCommentService(commentRepository repository.CommentRepository, DB *sql.D
 	}
 }
 
-func (cs *CommentServiceImpl) AddComment(ctx context.Context, id string, input domain.CommentInput) (*domain.Comment, error) {
-	if input.Message == "" {
+func (cs *CommentServiceImpl) AddComment(ctx context.Context, id string, comment domain.Comment) (*domain.Comment, error) {
+	if comment.Message == "" {
 		return nil, errors.New("message cannot be empty")
 	}
-
-	var comment domain.Comment
 
 	tx, err	:= cs.DB.Begin()
 	helper.PanicIfError(err)

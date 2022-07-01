@@ -27,7 +27,7 @@ func (cc *CommentControllerImpl) AddComment(writer http.ResponseWriter, request 
 	user := middleware.ForContext(ctx)
 	id := strconv.Itoa(user.ID)
 
-	var input domain.CommentInput
+	var input domain.Comment
 	errDecode := json.NewDecoder(request.Body).Decode(&input)
 
 	if errDecode != nil {
