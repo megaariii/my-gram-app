@@ -90,7 +90,7 @@ func (cr *CommentRepositoryImpl) GetCommentById(ctx context.Context, tx *sql.Tx,
 
 
 func (cr *CommentRepositoryImpl) UpdateComment(ctx context.Context, tx *sql.Tx, id string, comment domain.Comment) (*domain.Comment, error) {
-	SQL := `UPDATE comments SET message = $1, updated_a t= now() WHERE id = $2`
+	SQL := `UPDATE comments SET message = $1, updated_at = now() WHERE id = $2`
 
 	_, errRow := tx.ExecContext(ctx, SQL, comment.Message, id)
 

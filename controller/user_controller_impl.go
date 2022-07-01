@@ -128,7 +128,7 @@ func (uc *UserControllerImpl) Update(writer http.ResponseWriter, request *http.R
 	ctx := request.Context()
 	user := middleware.ForContext(ctx)
 
-	var login domain.UserLogin
+	var login domain.User
 	err := json.NewDecoder(request.Body).Decode(&login)
 	if err != nil {
 		writer.Header().Add("Content-Type", "application/json")

@@ -33,9 +33,9 @@ func CommentRouter(r *mux.Router, cc controller.CommentController) {
 }
 
 func SocialMediaRouter(r *mux.Router, smc controller.SocialMediaController) {
-	r.Handle("/social-media", middleware.Authentication(http.HandlerFunc(smc.CreateSocialMedia))).Methods("POST")
-	r.Handle("/social-medias", middleware.Authentication(http.HandlerFunc(smc.GetAllSocialMedia))).Methods("GET")
-	r.Handle("/social-media/{id}", middleware.Authentication(http.HandlerFunc(smc.GetAllSocialMedia))).Methods("GET")
-	r.Handle("/social-media/{id}", middleware.Authentication(http.HandlerFunc(smc.UpdateSocialMedia))).Methods("PUT")
-	r.Handle("/social-media/{id}", middleware.Authentication(http.HandlerFunc(smc.DeleteSocialMedia))).Methods("DELETE")
+	r.Handle("/socialmedia", middleware.Authentication(http.HandlerFunc(smc.CreateSocialMedia))).Methods("POST")
+	r.Handle("/socialmedias", middleware.Authentication(http.HandlerFunc(smc.GetAllSocialMedia))).Methods("GET")
+	r.Handle("/socialmedia/{id}", middleware.Authentication(http.HandlerFunc(smc.GetSocialMediaById))).Methods("GET")
+	r.Handle("/socialmedia/{id}", middleware.Authentication(http.HandlerFunc(smc.UpdateSocialMedia))).Methods("PUT")
+	r.Handle("/socialmedia/{id}", middleware.Authentication(http.HandlerFunc(smc.DeleteSocialMedia))).Methods("DELETE")
 }

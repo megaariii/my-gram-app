@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"log"
 	"my-gram/helper"
 	"my-gram/model/domain"
 	"my-gram/repository"
@@ -68,10 +69,11 @@ func (smr *SocialMediaServiceImpl) GetSocialMediaById(ctx context.Context, id st
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	getSmById, err := smr.SocialMediaRepository.GetSocialMediaById(ctx, tx, id)
+	getSmById, errGetById := smr.SocialMediaRepository.GetSocialMediaById(ctx, tx, id)
 
-	if err != nil {
-		return nil, err
+	if errGetById != nil {
+		log.Fatal(errGetById.Error())
+		return nil, errGetById
 	}
 
 	return getSmById, nil

@@ -45,7 +45,7 @@ func main() {
 	socialMediaRepository := repository.NewSocialMediaRepository()
 
 	userService := service.NewUserService(userRepository, app.Db)
-	photoService := service.NewPhotoService(photoRepository,app.Db)
+	photoService := service.NewPhotoService(photoRepository, commentRepository, app.Db)
 	commentService := service.NewCommentService(commentRepository, app.Db)
 	socialMediaService := service.NewSocialMediaService(socialMediaRepository, app.Db)
 

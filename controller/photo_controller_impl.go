@@ -75,7 +75,6 @@ func (pc *PhotoControllerImpl) GetPhotos(writer http.ResponseWriter, request *ht
 	writer.Write(response)
 }
 
-// GetPhotoById implements PhotoController
 func (pc *PhotoControllerImpl) GetPhotoById(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 	params := mux.Vars(request)
@@ -104,7 +103,7 @@ func (pc *PhotoControllerImpl) GetPhotoById(writer http.ResponseWriter, request 
 	writer.WriteHeader(http.StatusOK)
 	writer.Write(response)
 }
-// UpdatePhoto implements PhotoController
+
 func (pc *PhotoControllerImpl) UpdatePhoto(writer http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 	params := mux.Vars(request)

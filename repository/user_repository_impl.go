@@ -76,11 +76,12 @@ func (ur *UserRepositoryImpl) GetUserById(ctx context.Context, tx *sql.Tx, id st
 }
 
 func (ur *UserRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, user domain.User) (*domain.User, error) {
-	SQL := "update users set email = $1, username = $2 where id = $3"
-	_, err := tx.ExecContext(ctx, SQL, user.Email, user.Username, user.ID)
-	if err != nil {
-		fmt.Println("Update Repository Error: " + err.Error())
-		return nil, err
+	SQL := "update users set email = $1, username = $2, updated_at = now() where id = $3"
+	_, errRow := tx.ExecContext(ctx, SQL, user.Email, user.Username, user.ID)
+	
+	if errRow != nil {
+		fmt.Println("Update Repository Error: ", errRow.Error())
+		return nil, errRow
 	}
 
 	return &user, nil

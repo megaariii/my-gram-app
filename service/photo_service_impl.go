@@ -12,12 +12,14 @@ import (
 
 type PhotoServiceImpl struct {
 	PhotoRepository repository.PhotoRepository
+	CommentRepository repository.CommentRepository
 	DB              *sql.DB
 }
 
-func NewPhotoService(photoRepository repository.PhotoRepository, DB *sql.DB) PhotoService {
+func NewPhotoService(photoRepository repository.PhotoRepository, commentRepository repository.CommentRepository, DB *sql.DB) PhotoService {
 	return &PhotoServiceImpl{
 		PhotoRepository: photoRepository,
+		CommentRepository: commentRepository,
 		DB:              DB,
 	}
 }

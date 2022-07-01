@@ -100,7 +100,6 @@ func (smc *SocialMediaControllerImpl) GetSocialMediaById(writer http.ResponseWri
 	getById, errById := smc.SocialMediaService.GetSocialMediaById(ctx, id)
 
 	if errById != nil {
-		writer.Write([]byte(errById.Error()))
 		writer.Header().Add("Content-Type", "application/json")
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
@@ -171,7 +170,7 @@ func (smc *SocialMediaControllerImpl) DeleteSocialMedia(writer http.ResponseWrit
 	}
 
 	socialMediaDelete := response.DeleteSocialMediaRespone {
-		Message: "Your comment has been successfully deleted",
+		Message: "Your Social Media has been successfully deleted",
 	}
 
 	response, _ := json.Marshal(socialMediaDelete)
