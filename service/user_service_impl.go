@@ -8,6 +8,7 @@ import (
 	"my-gram/helper"
 	"my-gram/model/domain"
 	"my-gram/repository"
+	"time"
 )
 
 type UserServiceImpl struct {
@@ -93,7 +94,7 @@ func (us *UserServiceImpl) GetUserById(ctx context.Context, id string) (*domain.
 	return user, nil
 }
 
-func (us *UserServiceImpl) Update(ctx context.Context, id string, user domain.User) (*domain.User, error) { 
+func (us *UserServiceImpl) Update(ctx context.Context, id string, user domain.UserLogin) (*domain.User, error) { 
 	tx, err	:= us.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
@@ -104,15 +105,15 @@ func (us *UserServiceImpl) Update(ctx context.Context, id string, user domain.Us
 		return nil, errGetId
 	}
 
-	updatedUser, err := us.UserRepository.Update(ctx, tx, *userId)
+	userId.Email = user.Email
+	userId.Username = user.Username
+	userId.UpdatedAt = time.Now()
+
+	updatedUser, err := us.UserRepository.Update(ctx, *userId)
 	if err != nil {
 		log.Fatalln(err.Error())
 		return nil, err
 	}
-	
-	// userId.Email = user.Email
-	// userId.Username = user.Username
-	// userId.UpdatedAt = time.Now()
 
 	return updatedUser, nil
 }

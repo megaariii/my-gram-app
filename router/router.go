@@ -9,11 +9,11 @@ import (
 )
 
 func UserRouter(r *mux.Router, uc controller.UserController) {
-	r.HandleFunc("/users/register", uc.Register).Methods("POST")
-	r.HandleFunc("/users/login", uc.Login).Methods("POST")
-	r.Handle("/users/profile", middleware.Authentication(http.HandlerFunc(uc.GetUserById))).Methods("GET")
-	r.Handle("/users", middleware.Authentication(http.HandlerFunc(uc.Update))).Methods("PUT")
-	r.Handle("/users", middleware.Authentication(http.HandlerFunc(uc.Delete))).Methods("DELETE")
+	r.HandleFunc("/user/register", uc.Register).Methods("POST")
+	r.HandleFunc("/user/login", uc.Login).Methods("POST")
+	r.Handle("/user/profile", middleware.Authentication(http.HandlerFunc(uc.GetUserById))).Methods("GET")
+	r.Handle("/user", middleware.Authentication(http.HandlerFunc(uc.Update))).Methods("PUT")
+	r.Handle("/user", middleware.Authentication(http.HandlerFunc(uc.Delete))).Methods("DELETE")
 }
 
 func PhotoRouter(r *mux.Router, pc controller.PhotoController) {

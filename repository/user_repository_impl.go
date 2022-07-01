@@ -5,8 +5,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"my-gram/app"
 	"my-gram/helper"
 	"my-gram/model/domain"
+	"time"
 )
 
 type UserRepositoryImpl struct {
@@ -75,10 +77,10 @@ func (ur *UserRepositoryImpl) GetUserById(ctx context.Context, tx *sql.Tx, id st
 	}
 }
 
-func (ur *UserRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, user domain.User) (*domain.User, error) {
-	SQL := "update users set email = $1, username = $2, updated_at = now() where id = $3"
-	_, errRow := tx.ExecContext(ctx, SQL, user.Email, user.Username, user.ID)
-	
+func (ur *UserRepositoryImpl) Update(ctx context.Context, user domain.User) (*domain.User, error) {
+	SQL := `update users set email = $1, username = $2, updated_at = $3 where id = $4`
+	_, errRow := app.Db.Exec(SQL, user.Email, user.Username, time.Now(), user.ID)
+
 	if errRow != nil {
 		fmt.Println("Update Repository Error: ", errRow.Error())
 		return nil, errRow

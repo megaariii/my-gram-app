@@ -45,12 +45,6 @@ func (uc *UserControllerImpl) Register(writer http.ResponseWriter, request *http
 		Age:      newRegister.Age,
 	}
 
-	// webResponse := response.WebResponse {
-	// 	Code: http.StatusCreated,
-	// 	Status: "Success to Created User",
-	// 	Data: registerRespone,
-	// }
-
 	response, _ := json.Marshal(registerRespone)
 	writer.Header().Add("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusCreated)
@@ -128,7 +122,7 @@ func (uc *UserControllerImpl) Update(writer http.ResponseWriter, request *http.R
 	ctx := request.Context()
 	user := middleware.ForContext(ctx)
 
-	var login domain.User
+	var login domain.UserLogin
 	err := json.NewDecoder(request.Body).Decode(&login)
 	if err != nil {
 		writer.Header().Add("Content-Type", "application/json")
