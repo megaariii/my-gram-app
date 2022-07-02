@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"encoding/json"
+	"my-gram/helper"
 	"my-gram/middleware"
 	"my-gram/model/domain"
 	"my-gram/model/response"
@@ -23,20 +23,13 @@ func NewPhotoController(photoService service.PhotoService) PhotoController {
 }
 
 func (pc *PhotoControllerImpl) CreatePhoto(writer http.ResponseWriter, request *http.Request) {
-	ctx := request.Context()
-	user := middleware.ForContext(ctx)
+	user := middleware.ForContext(request.Context())
 	id := strconv.Itoa(user.ID)
 
 	var photo domain.Photo
-	errDecode := json.NewDecoder(request.Body).Decode(&photo)
+	helper.ReadFromRequestBody(request, &photo)
 
-	if errDecode != nil {
-		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	newPhoto, errCreate := pc.PhotoService.CreatePhoto(ctx, id, photo)
+	newPhoto, errCreate := pc.PhotoService.CreatePhoto(request.Context(), id, photo)
 
 	if errCreate != nil {
 		writer.Header().Add("Content-Type", "application/json")
@@ -53,13 +46,15 @@ func (pc *PhotoControllerImpl) CreatePhoto(writer http.ResponseWriter, request *
 		CreatedAt: newPhoto.CreatedAt,
 	}
 
-	response, _ := json.Marshal(createPhotoResponso)
-	writer.Header().Add("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusCreated)
-	writer.Write(response)
+	webResponse := response.WebResponse{
+		Code:   201,
+		Status: "Created",
+		Data:   createPhotoResponso,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }
 
-// GetPhotos implements PhotoController
 func (pc *PhotoControllerImpl) GetPhotos(writer http.ResponseWriter, request *http.Request) {
 	photos, err := pc.PhotoService.GetPhotos()
 	if err != nil {
@@ -69,18 +64,20 @@ func (pc *PhotoControllerImpl) GetPhotos(writer http.ResponseWriter, request *ht
 		return
 	}
 
-	response, _ := json.Marshal(photos)
-	writer.Header().Add("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(response)
+	webResponse := response.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   photos,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }
 
 func (pc *PhotoControllerImpl) GetPhotoById(writer http.ResponseWriter, request *http.Request) {
-	ctx := request.Context()
 	params := mux.Vars(request)
 	id := params["id"]
 
-	photoId, errGetById := pc.PhotoService.GetPhotoById(ctx, id)
+	photoId, errGetById := pc.PhotoService.GetPhotoById(request.Context(), id)
 
 	if errGetById != nil {
 		writer.Header().Add("Content-Type", "application/json")
@@ -98,27 +95,23 @@ func (pc *PhotoControllerImpl) GetPhotoById(writer http.ResponseWriter, request 
 		UpdatedAt: photoId.UpdatedAt,
 	}
 
-	response, _ := json.Marshal(photoById)
-	writer.Header().Add("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(response)
+	webResponse := response.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   photoById,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }
 
 func (pc *PhotoControllerImpl) UpdatePhoto(writer http.ResponseWriter, request *http.Request) {
-	ctx := request.Context()
 	params := mux.Vars(request)
 	id := params["id"]
 
 	var photo domain.Photo
-	errDecode := json.NewDecoder(request.Body).Decode(&photo)
+	helper.ReadFromRequestBody(request, &photo)
 
-	if errDecode != nil {
-		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	updatedPhoto, errUpdate := pc.PhotoService.UpdatePhoto(ctx, id, photo)
+	updatedPhoto, errUpdate := pc.PhotoService.UpdatePhoto(request.Context(), id, photo)
 
 	if errUpdate != nil {
 		writer.Header().Add("Content-Type", "application/json")
@@ -135,13 +128,15 @@ func (pc *PhotoControllerImpl) UpdatePhoto(writer http.ResponseWriter, request *
 		UpdatedAt: updatedPhoto.UpdatedAt,
 	}
 
-	response, _ := json.Marshal(newPhoto)
-	writer.Header().Add("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(response)
+	webResponse := response.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   newPhoto,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }
 
-// DeletePhoto implements PhotoController
 func (pc *PhotoControllerImpl) DeletePhoto(writer http.ResponseWriter, request *http.Request) {
 	params := mux.Vars(request)
 	id := params["id"]
@@ -158,8 +153,11 @@ func (pc *PhotoControllerImpl) DeletePhoto(writer http.ResponseWriter, request *
 		Message: "Your photo has been successfully deleted",
 	}
 
-	response, _ := json.Marshal(photoDelete)
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(response)
+	webResponse := response.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   photoDelete,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }

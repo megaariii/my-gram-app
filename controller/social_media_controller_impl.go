@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"encoding/json"
+	"my-gram/helper"
 	"my-gram/middleware"
 	"my-gram/model/domain"
 	"my-gram/model/response"
@@ -23,20 +23,13 @@ func NewSocialMediaController(socialMediaService service.SocialMediaService) Soc
 }
 
 func (smc *SocialMediaControllerImpl) CreateSocialMedia(writer http.ResponseWriter, request *http.Request) {
-	ctx := request.Context()
-	user := middleware.ForContext(ctx)
+	user := middleware.ForContext(request.Context())
 	id := strconv.Itoa(user.ID)
 
 	var input domain.SocialMediaInput
-	errDecode := json.NewDecoder(request.Body).Decode(&input)
+	helper.ReadFromRequestBody(request, &input)
 
-	if errDecode != nil {
-		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	newSm, errCreate := smc.SocialMediaService.CreateSocialMedia(ctx, id, input)
+	newSm, errCreate := smc.SocialMediaService.CreateSocialMedia(request.Context(), id, input)
 
 	if errCreate != nil {
 		writer.Header().Add("Content-Type", "application/json")
@@ -52,15 +45,17 @@ func (smc *SocialMediaControllerImpl) CreateSocialMedia(writer http.ResponseWrit
 		CreatedAt: newSm.CreatedAt,
 	}
 
-	response, _ := json.Marshal(newSocialMedia)
-	writer.Header().Add("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusCreated)
-	writer.Write(response)
+	webResponse := response.WebResponse{
+		Code:   201,
+		Status: "Created",
+		Data:   newSocialMedia,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }
 
 func (smc *SocialMediaControllerImpl) GetAllSocialMedia(writer http.ResponseWriter, request *http.Request) {
-	ctx := request.Context()
-	socialMedias, errSocialMedias := smc.SocialMediaService.GetAllSocialMedia(ctx)
+	socialMedias, errSocialMedias := smc.SocialMediaService.GetAllSocialMedia(request.Context())
 
 	if errSocialMedias != nil {
 		writer.Header().Add("Content-Type", "application/json")
@@ -85,19 +80,20 @@ func (smc *SocialMediaControllerImpl) GetAllSocialMedia(writer http.ResponseWrit
 		}
 		socialMediasResponse = append(socialMediasResponse, formatter)
 	}
+	webResponse := response.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   socialMediasResponse,
+	}
 
-	response, _ := json.Marshal(socialMediasResponse)
-	writer.Header().Add("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(response)
+	helper.WriteToResponseBody(writer, webResponse)
 }
 
 func (smc *SocialMediaControllerImpl) GetSocialMediaById(writer http.ResponseWriter, request *http.Request) {
-	ctx := request.Context()
 	params := mux.Vars(request)
 	id := params["id"]
 
-	getById, errById := smc.SocialMediaService.GetSocialMediaById(ctx, id)
+	getById, errById := smc.SocialMediaService.GetSocialMediaById(request.Context(), id)
 
 	if errById != nil {
 		writer.Header().Add("Content-Type", "application/json")
@@ -114,27 +110,23 @@ func (smc *SocialMediaControllerImpl) GetSocialMediaById(writer http.ResponseWri
 		UpdatedAt: getById.UpdatedAt,
 	}
 
-	response, _ := json.Marshal(socialMediaById)
-	writer.Header().Add("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(response)
+	webResponse := response.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   socialMediaById,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }
 
 func (smc *SocialMediaControllerImpl) UpdateSocialMedia(writer http.ResponseWriter, request *http.Request) {
-	ctx := request.Context()
 	params := mux.Vars(request)
 	id := params["id"]
 
 	var input domain.SocialMediaInput
-	errDecode := json.NewDecoder(request.Body).Decode(&input)
+	helper.ReadFromRequestBody(request, &input)
 
-	if errDecode != nil {
-		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	updateSm, errUpdateSosmed := smc.SocialMediaService.UpdateSocialMedia(ctx, id, input)
+	updateSm, errUpdateSosmed := smc.SocialMediaService.UpdateSocialMedia(request.Context(), id, input)
 
 	if errUpdateSosmed != nil {
 		writer.Header().Add("Content-Type", "application/json")
@@ -150,18 +142,20 @@ func (smc *SocialMediaControllerImpl) UpdateSocialMedia(writer http.ResponseWrit
 		UpdatedAt: updateSm.UpdatedAt,
 	}
 
-	response, _ := json.Marshal(newSosialMedia)
-	writer.Header().Add("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(response)
+	webResponse := response.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   newSosialMedia,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }
 
 func (smc *SocialMediaControllerImpl) DeleteSocialMedia(writer http.ResponseWriter, request *http.Request) {
-	ctx := request.Context()
 	params := mux.Vars(request)
 	id := params["id"]
 
-	errDelete := smc.SocialMediaService.DeleteSocialMedia(ctx, id)
+	errDelete := smc.SocialMediaService.DeleteSocialMedia(request.Context(), id)
 
 	if errDelete != nil {
 		writer.Header().Add("Content-Type", "application/json")
@@ -173,8 +167,11 @@ func (smc *SocialMediaControllerImpl) DeleteSocialMedia(writer http.ResponseWrit
 		Message: "Your Social Media has been successfully deleted",
 	}
 
-	response, _ := json.Marshal(socialMediaDelete)
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(response)
+	webResponse := response.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   socialMediaDelete,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }

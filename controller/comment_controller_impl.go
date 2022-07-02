@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"encoding/json"
+	"my-gram/helper"
 	"my-gram/middleware"
 	"my-gram/model/domain"
 	"my-gram/model/response"
@@ -23,20 +23,13 @@ func NewCommentController(commentService service.CommentService) CommentControll
 }
 
 func (cc *CommentControllerImpl) AddComment(writer http.ResponseWriter, request *http.Request) {
-	ctx := request.Context()
-	user := middleware.ForContext(ctx)
+	user := middleware.ForContext(request.Context())
 	id := strconv.Itoa(user.ID)
 
 	var input domain.Comment
-	errDecode := json.NewDecoder(request.Body).Decode(&input)
+	helper.ReadFromRequestBody(request, &input)
 
-	if errDecode != nil {
-		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	newComment, errCreate := cc.CommentService.AddComment(ctx, id, input)
+	newComment, errCreate := cc.CommentService.AddComment(request.Context(), id, input)
 
 	if errCreate != nil {
 		writer.Header().Add("Content-Type", "application/json")
@@ -52,15 +45,17 @@ func (cc *CommentControllerImpl) AddComment(writer http.ResponseWriter, request 
 		CreatedAt: newComment.CreatedAt,
 	}
 
-	response, _ := json.Marshal(createComment)
-	writer.Header().Add("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusCreated)
-	writer.Write(response)
+	webResponse := response.WebResponse{
+		Code:   201,
+		Status: "Created",
+		Data:   createComment,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }
 
 func (cc *CommentControllerImpl) GetAllComment(writer http.ResponseWriter, request *http.Request) {
-	ctx := request.Context()
-	commentAll, errGetAll := cc.CommentService.GetAllComment(ctx)
+	commentAll, errGetAll := cc.CommentService.GetAllComment(request.Context())
 	if errGetAll != nil {
 		writer.Write([]byte(errGetAll.Error()))
 		writer.Header().Add("Content-Type", "application/json")
@@ -68,18 +63,19 @@ func (cc *CommentControllerImpl) GetAllComment(writer http.ResponseWriter, reque
 		return
 	}
 
-	response, _ := json.Marshal(commentAll)
-	writer.Header().Add("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(response)
-}
+	webResponse := response.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   commentAll,
+	}
 
+	helper.WriteToResponseBody(writer, webResponse)
+}
 func (cc *CommentControllerImpl) GetCommentById(writer http.ResponseWriter, request *http.Request) {
-	ctx := request.Context()
 	params := mux.Vars(request)
 	id := params["id"]
 
-	getById, errById := cc.CommentService.GetCommentById(ctx, id)
+	getById, errById := cc.CommentService.GetCommentById(request.Context(), id)
 	
 	if errById != nil {
 		writer.Write([]byte(errById.Error()))
@@ -97,27 +93,23 @@ func (cc *CommentControllerImpl) GetCommentById(writer http.ResponseWriter, requ
 		UpdatedAt: getById.UpdatedAt,
 	}
 
-	response, _ := json.Marshal(getCommentById)
-	writer.Header().Add("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(response)
+	webResponse := response.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   getCommentById,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }
 
 func (cc *CommentControllerImpl) UpdateComment(writer http.ResponseWriter, request *http.Request) {
-	ctx := request.Context()
 	params := mux.Vars(request)
 	id := params["id"]
 
 	var input domain.CommentInput
-	errDecode := json.NewDecoder(request.Body).Decode(&input)
+	helper.ReadFromRequestBody(request, &input)
 
-	if errDecode != nil {
-		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	updatedComment, errUpdateComment := cc.CommentService.UpdateComment(ctx, id, input)
+	updatedComment, errUpdateComment := cc.CommentService.UpdateComment(request.Context(), id, input)
 
 	if errUpdateComment != nil {
 		writer.Header().Add("Content-Type", "application/json")
@@ -133,10 +125,13 @@ func (cc *CommentControllerImpl) UpdateComment(writer http.ResponseWriter, reque
 		UpdatedAt: updatedComment.UpdatedAt,
 	}
 
-	response, _ := json.Marshal(newComment)
-	writer.Header().Add("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(response)
+	webResponse := response.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   newComment,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }
 
 func (cc *CommentControllerImpl) DeleteComment(writer http.ResponseWriter, request *http.Request) {
@@ -155,8 +150,11 @@ func (cc *CommentControllerImpl) DeleteComment(writer http.ResponseWriter, reque
 		Message: "Your comment has been successfully deleted",
 	}
 
-	response, _ := json.Marshal(commentDelete)
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(response)
+	webResponse := response.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   commentDelete,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }

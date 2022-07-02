@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"encoding/json"
 	"my-gram/helper"
 	"my-gram/middleware"
 	"my-gram/model/domain"
@@ -23,13 +22,7 @@ func NewUserController(userService service.UserService) UserController {
 
 func (uc *UserControllerImpl) Register(writer http.ResponseWriter, request *http.Request) {
 	var user domain.User
-	decoder := json.NewDecoder(request.Body)
-	err := decoder.Decode(&user)
-	if err != nil {
-		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+	helper.ReadFromRequestBody(request, &user)
 
 	newRegister, errRegister := uc.UserService.Register(request.Context(), user)
 	if errRegister != nil {
@@ -45,20 +38,18 @@ func (uc *UserControllerImpl) Register(writer http.ResponseWriter, request *http
 		Age:      newRegister.Age,
 	}
 
-	response, _ := json.Marshal(registerRespone)
-	writer.Header().Add("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusCreated)
-	writer.Write(response)
+	webResponse := response.WebResponse {
+		Code: 201,
+		Status: "Created",
+		Data: registerRespone,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }
 
 func (uc *UserControllerImpl) Login(writer http.ResponseWriter, request *http.Request) {
 	var login domain.UserLogin
-	err := json.NewDecoder(request.Body).Decode(&login)
-	if err != nil {
-		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+	helper.ReadFromRequestBody(request, &login)
 
 	errValidate := helper.CheckEmpty(login.Email, login.Password)
 	if errValidate != nil {
@@ -87,18 +78,20 @@ func (uc *UserControllerImpl) Login(writer http.ResponseWriter, request *http.Re
 		Token: token,
 	}
 
-	response, _ := json.Marshal(userToken)
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(response)
+	webResponse := response.WebResponse {
+		Code: 200,
+		Status: "OK",
+		Data: userToken,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }
 
 func (uc *UserControllerImpl) GetUserById(writer http.ResponseWriter, request *http.Request) {
-	ctx := request.Context()
-	user := middleware.ForContext(ctx)
+	user := middleware.ForContext(request.Context())
 	id := strconv.Itoa(user.ID)
 
-	userId, err := uc.UserService.GetUserById(ctx, id)
+	userId, err := uc.UserService.GetUserById(request.Context(), id)
 	if err != nil {
 		writer.Header().Set("Content-Type", "application/json")
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -112,27 +105,24 @@ func (uc *UserControllerImpl) GetUserById(writer http.ResponseWriter, request *h
 		Age: userId.Age,
 	}
 	
-	response, _ := json.Marshal(userById)
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(response)
+	webResponse := response.WebResponse {
+		Code: 200,
+		Status: "OK",
+		Data: userById,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }
 
 func (uc *UserControllerImpl) Update(writer http.ResponseWriter, request *http.Request) {
-	ctx := request.Context()
-	user := middleware.ForContext(ctx)
+	user := middleware.ForContext(request.Context())
 
 	var login domain.UserLogin
-	err := json.NewDecoder(request.Body).Decode(&login)
-	if err != nil {
-		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+	helper.ReadFromRequestBody(request, &login)
 
 	id := strconv.Itoa(user.ID)
 
-	userUpdate, errUpdate := uc.UserService.Update(ctx, id, login)
+	userUpdate, errUpdate := uc.UserService.Update(request.Context(), id, login)
 	if errUpdate != nil {
 		writer.Header().Set("Content-Type", "application/json")
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -146,19 +136,21 @@ func (uc *UserControllerImpl) Update(writer http.ResponseWriter, request *http.R
 		UpdatedAt: 	userUpdate.UpdatedAt,
 	}
 
-	response, _ := json.Marshal(newUserUpdate)
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(response)
+	webResponse := response.WebResponse {
+		Code: 200,
+		Status: "OK",
+		Data: newUserUpdate,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }
 
 func (uc *UserControllerImpl) Delete(writer http.ResponseWriter, request *http.Request) {
-	ctx := request.Context()
-	user := middleware.ForContext(ctx)
+	user := middleware.ForContext(request.Context())
 
 	id := strconv.Itoa(user.ID)
 
-	err := uc.UserService.Delete(ctx, id)
+	err := uc.UserService.Delete(request.Context(), id)
 
 	if err != nil {
 		writer.Header().Set("Content-Type", "application/json")
@@ -170,8 +162,11 @@ func (uc *UserControllerImpl) Delete(writer http.ResponseWriter, request *http.R
 		Message: "Your account has been successfully deleted",
 	}
 
-	response, _ := json.Marshal(userDelete)
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(response)
+	webResponse := response.WebResponse {
+		Code: 200,
+		Status: "OK",
+		Data: userDelete,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
 }

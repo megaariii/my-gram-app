@@ -2,12 +2,6 @@ package response
 
 import "time"
 
-type WebResponse struct {
-	Code   int
-	Status string
-	Data   interface{}
-}
-
 type RegisterRespone struct {
 	User_id  int    `json:"id"`
 	Username string `json:"username"`
