@@ -31,7 +31,7 @@ func badRequestError(writer http.ResponseWriter, request *http.Request, err inte
 			Data: exception.Error,
 		}
 	
-		helper.WriteToResponseBody(writer, webResponse)
+		helper.WriteToResponseBody(writer, http.StatusBadRequest ,webResponse)
 		return true
 	} else {
 		return false
@@ -50,7 +50,7 @@ func notFoundError(writer http.ResponseWriter, request *http.Request, err interf
 			Data: exception.Error,
 		}
 	
-		helper.WriteToResponseBody(writer, webResponse)
+		helper.WriteToResponseBody(writer, http.StatusNotFound, webResponse)
 		return true
 	} else {
 		return false
@@ -67,5 +67,5 @@ func internalServerError(writer http.ResponseWriter, request *http.Request, err 
 		Data: err,
 	}
 
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, http.StatusInternalServerError, webResponse)
 }

@@ -44,12 +44,12 @@ func (smc *SocialMediaControllerImpl) CreateSocialMedia(writer http.ResponseWrit
 	}
 
 	webResponse := response.WebResponse{
-		Code:   201,
+		Code:   http.StatusCreated,
 		Status: "Created",
 		Data:   newSocialMedia,
 	}
 
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, http.StatusCreated, webResponse)
 }
 
 func (smc *SocialMediaControllerImpl) GetAllSocialMedia(writer http.ResponseWriter, request *http.Request) {
@@ -76,12 +76,12 @@ func (smc *SocialMediaControllerImpl) GetAllSocialMedia(writer http.ResponseWrit
 		socialMediasResponse = append(socialMediasResponse, formatter)
 	}
 	webResponse := response.WebResponse{
-		Code:   200,
+		Code:   http.StatusOK,
 		Status: "OK",
 		Data:   socialMediasResponse,
 	}
 
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, http.StatusOK, webResponse)
 }
 
 func (smc *SocialMediaControllerImpl) GetSocialMediaById(writer http.ResponseWriter, request *http.Request) {
@@ -103,12 +103,12 @@ func (smc *SocialMediaControllerImpl) GetSocialMediaById(writer http.ResponseWri
 	}
 
 	webResponse := response.WebResponse{
-		Code:   200,
+		Code:   http.StatusOK,
 		Status: "OK",
 		Data:   socialMediaById,
 	}
 
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, http.StatusOK, webResponse)
 }
 
 func (smc *SocialMediaControllerImpl) UpdateSocialMedia(writer http.ResponseWriter, request *http.Request) {
@@ -132,12 +132,12 @@ func (smc *SocialMediaControllerImpl) UpdateSocialMedia(writer http.ResponseWrit
 	}
 
 	webResponse := response.WebResponse{
-		Code:   200,
+		Code:   http.StatusOK,
 		Status: "OK",
 		Data:   newSosialMedia,
 	}
 
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, http.StatusOK, webResponse)
 }
 
 func (smc *SocialMediaControllerImpl) DeleteSocialMedia(writer http.ResponseWriter, request *http.Request) {
@@ -154,10 +154,10 @@ func (smc *SocialMediaControllerImpl) DeleteSocialMedia(writer http.ResponseWrit
 	}
 
 	webResponse := response.WebResponse{
-		Code:   200,
+		Code:   http.StatusOK,
 		Status: "OK",
 		Data:   socialMediaDelete,
 	}
 
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, http.StatusOK, webResponse)
 }

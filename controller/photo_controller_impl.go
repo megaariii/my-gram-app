@@ -45,12 +45,12 @@ func (pc *PhotoControllerImpl) CreatePhoto(writer http.ResponseWriter, request *
 	}
 
 	webResponse := response.WebResponse{
-		Code:   201,
+		Code:   http.StatusCreated,
 		Status: "Created",
 		Data:   createPhotoResponso,
 	}
 
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, http.StatusCreated, webResponse)
 }
 
 func (pc *PhotoControllerImpl) GetPhotos(writer http.ResponseWriter, request *http.Request) {
@@ -58,12 +58,12 @@ func (pc *PhotoControllerImpl) GetPhotos(writer http.ResponseWriter, request *ht
 	helper.PanicIfError(err)
 
 	webResponse := response.WebResponse{
-		Code:   200,
+		Code:   http.StatusOK,
 		Status: "OK",
 		Data:   photos,
 	}
 
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, http.StatusOK, webResponse)
 }
 
 func (pc *PhotoControllerImpl) GetPhotoById(writer http.ResponseWriter, request *http.Request) {
@@ -86,12 +86,12 @@ func (pc *PhotoControllerImpl) GetPhotoById(writer http.ResponseWriter, request 
 	}
 
 	webResponse := response.WebResponse{
-		Code:   200,
+		Code:   http.StatusOK,
 		Status: "OK",
 		Data:   photoById,
 	}
 
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, http.StatusOK, webResponse)
 }
 
 func (pc *PhotoControllerImpl) UpdatePhoto(writer http.ResponseWriter, request *http.Request) {
@@ -116,12 +116,12 @@ func (pc *PhotoControllerImpl) UpdatePhoto(writer http.ResponseWriter, request *
 	}
 
 	webResponse := response.WebResponse{
-		Code:   200,
+		Code:   http.StatusOK,
 		Status: "OK",
 		Data:   newPhoto,
 	}
 
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, http.StatusOK, webResponse)
 }
 
 func (pc *PhotoControllerImpl) DeletePhoto(writer http.ResponseWriter, request *http.Request) {
@@ -138,10 +138,10 @@ func (pc *PhotoControllerImpl) DeletePhoto(writer http.ResponseWriter, request *
 	}
 
 	webResponse := response.WebResponse{
-		Code:   200,
+		Code:   http.StatusOK,
 		Status: "OK",
 		Data:   photoDelete,
 	}
 
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, http.StatusOK, webResponse)
 }

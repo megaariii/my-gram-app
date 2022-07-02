@@ -44,12 +44,12 @@ func (cc *CommentControllerImpl) AddComment(writer http.ResponseWriter, request 
 	}
 
 	webResponse := response.WebResponse{
-		Code:   201,
+		Code:   http.StatusCreated,
 		Status: "Created",
 		Data:   createComment,
 	}
 
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, http.StatusCreated, webResponse)
 }
 
 func (cc *CommentControllerImpl) GetAllComment(writer http.ResponseWriter, request *http.Request) {
@@ -59,12 +59,12 @@ func (cc *CommentControllerImpl) GetAllComment(writer http.ResponseWriter, reque
 	}
 
 	webResponse := response.WebResponse{
-		Code:   200,
+		Code:   http.StatusOK,
 		Status: "OK",
 		Data:   commentAll,
 	}
 
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, http.StatusOK, webResponse)
 }
 func (cc *CommentControllerImpl) GetCommentById(writer http.ResponseWriter, request *http.Request) {
 	params := mux.Vars(request)
@@ -85,12 +85,12 @@ func (cc *CommentControllerImpl) GetCommentById(writer http.ResponseWriter, requ
 	}
 
 	webResponse := response.WebResponse{
-		Code:   200,
+		Code:   http.StatusOK,
 		Status: "OK",
 		Data:   getCommentById,
 	}
 
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, http.StatusOK, webResponse)
 }
 
 func (cc *CommentControllerImpl) UpdateComment(writer http.ResponseWriter, request *http.Request) {
@@ -114,12 +114,12 @@ func (cc *CommentControllerImpl) UpdateComment(writer http.ResponseWriter, reque
 	}
 
 	webResponse := response.WebResponse{
-		Code:   200,
+		Code:   http.StatusOK,
 		Status: "OK",
 		Data:   newComment,
 	}
 
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, http.StatusOK, webResponse)
 }
 
 func (cc *CommentControllerImpl) DeleteComment(writer http.ResponseWriter, request *http.Request) {
@@ -136,10 +136,10 @@ func (cc *CommentControllerImpl) DeleteComment(writer http.ResponseWriter, reque
 	}
 
 	webResponse := response.WebResponse{
-		Code:   200,
+		Code:   http.StatusOK,
 		Status: "OK",
 		Data:   commentDelete,
 	}
 
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, http.StatusOK, webResponse)
 }

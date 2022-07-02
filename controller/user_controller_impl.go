@@ -38,12 +38,12 @@ func (uc *UserControllerImpl) Register(writer http.ResponseWriter, request *http
 	}
 
 	webResponse := response.WebResponse {
-		Code: 201,
+		Code: http.StatusCreated,
 		Status: "Created",
 		Data: registerRespone,
 	}
 
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, http.StatusCreated, webResponse)
 }
 
 func (uc *UserControllerImpl) Login(writer http.ResponseWriter, request *http.Request) {
@@ -72,12 +72,12 @@ func (uc *UserControllerImpl) Login(writer http.ResponseWriter, request *http.Re
 	}
 
 	webResponse := response.WebResponse {
-		Code: 200,
+		Code: http.StatusOK,
 		Status: "OK",
 		Data: userToken,
 	}
 
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, http.StatusOK, webResponse)
 }
 
 func (uc *UserControllerImpl) GetUserById(writer http.ResponseWriter, request *http.Request) {
@@ -97,12 +97,12 @@ func (uc *UserControllerImpl) GetUserById(writer http.ResponseWriter, request *h
 	}
 	
 	webResponse := response.WebResponse {
-		Code: 200,
+		Code: http.StatusOK,
 		Status: "OK",
 		Data: userById,
 	}
 
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, http.StatusOK, webResponse)
 }
 
 func (uc *UserControllerImpl) Update(writer http.ResponseWriter, request *http.Request) {
@@ -127,12 +127,12 @@ func (uc *UserControllerImpl) Update(writer http.ResponseWriter, request *http.R
 	}
 
 	webResponse := response.WebResponse {
-		Code: 200,
+		Code: http.StatusOK,
 		Status: "OK",
 		Data: newUserUpdate,
 	}
 
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, http.StatusOK, webResponse)
 }
 
 func (uc *UserControllerImpl) Delete(writer http.ResponseWriter, request *http.Request) {
@@ -150,10 +150,10 @@ func (uc *UserControllerImpl) Delete(writer http.ResponseWriter, request *http.R
 	}
 
 	webResponse := response.WebResponse {
-		Code: 200,
+		Code: http.StatusOK,
 		Status: "OK",
 		Data: userDelete,
 	}
 
-	helper.WriteToResponseBody(writer, webResponse)
+	helper.WriteToResponseBody(writer, http.StatusOK, webResponse)
 }
