@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"log"
+	"my-gram/exception"
 	"my-gram/helper"
 	"my-gram/model/domain"
 	"my-gram/repository"
@@ -22,7 +22,6 @@ func NewSocialMediaService(socialMediaRepository repository.SocialMediaRepositor
 	}
 }
 
-// CreateSocialMedia implements SocialMediaService
 func (smr *SocialMediaServiceImpl) CreateSocialMedia(ctx context.Context, id string, sm domain.SocialMediaInput) (*domain.SocialMedia, error) {
 	if sm.Name == "" {
 		return nil, errors.New("name cannot be empty")
@@ -41,10 +40,7 @@ func (smr *SocialMediaServiceImpl) CreateSocialMedia(ctx context.Context, id str
 	socialMedia.SocialMediaUrl = sm.SocialMediaUrl
 
 	newSm, err := smr.SocialMediaRepository.CreateSocialMedia(ctx, tx, id, socialMedia)
-
-	if err != nil {
-		return nil, err
-	}
+	helper.PanicIfError(err)
 
 	return newSm, nil
 }
@@ -63,17 +59,14 @@ func (smr *SocialMediaServiceImpl) GetAllSocialMedia(ctx context.Context) ([]*do
 	return getSmAll, nil
 }
 
-// GetSocialMediaById implements SocialMediaService
 func (smr *SocialMediaServiceImpl) GetSocialMediaById(ctx context.Context, id string) (*domain.SocialMedia, error) {
 	tx, err	:= smr.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
 	getSmById, errGetById := smr.SocialMediaRepository.GetSocialMediaById(ctx, tx, id)
-
 	if errGetById != nil {
-		log.Fatal(errGetById.Error())
-		return nil, errGetById
+		panic(exception.NewNotFoundError(errGetById.Error()))
 	}
 
 	return getSmById, nil
@@ -97,10 +90,10 @@ func (smr *SocialMediaServiceImpl) UpdateSocialMedia(ctx context.Context, id str
 	socialMedia.SocialMediaUrl = sm.SocialMediaUrl
 
 	updateSm, err := smr.SocialMediaRepository.UpdateSocialMedia(ctx, tx, id, socialMedia)
-
 	if err != nil {
-		return nil, err
+		panic(exception.NewNotFoundError(err.Error()))
 	}
+
 
 	return updateSm, nil
 }
@@ -111,9 +104,8 @@ func (smr *SocialMediaServiceImpl) DeleteSocialMedia(ctx context.Context, id str
 	defer helper.CommitOrRollback(tx)
 
 	errDelete := smr.SocialMediaRepository.DeleteSocialMedia(ctx, tx, id)
-
 	if errDelete != nil {
-		return err
+		panic(exception.NewNotFoundError(errDelete.Error()))
 	}
 
 	return nil

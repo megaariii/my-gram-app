@@ -6,6 +6,7 @@ import (
 	"log"
 	"my-gram/app"
 	"my-gram/controller"
+	"my-gram/exception"
 	"my-gram/middleware"
 	"my-gram/repository"
 	"my-gram/router"
@@ -15,6 +16,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/ilyakaznacheev/cleanenv"
+	"github.com/julienschmidt/httprouter"
 	_ "github.com/lib/pq"
 )
 
@@ -61,6 +63,9 @@ func main() {
 	router.PhotoRouter(r, photoController)
 	router.CommentRouter(r, commentController)
 	router.SocialMediaRouter(r, socialMediaController)
+
+	routerError := httprouter.New()
+	routerError.PanicHandler = exception.ErrorHandler
 
 	srv := &http.Server{
 		Handler: r,

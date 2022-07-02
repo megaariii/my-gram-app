@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"my-gram/exception"
 	"my-gram/helper"
 	"my-gram/middleware"
 	"my-gram/model/domain"
@@ -26,9 +27,7 @@ func (uc *UserControllerImpl) Register(writer http.ResponseWriter, request *http
 
 	newRegister, errRegister := uc.UserService.Register(request.Context(), user)
 	if errRegister != nil {
-		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusBadRequest)
-		return
+		panic(exception.NewBadRequestError(errRegister.Error()))
 	}
 
 	registerRespone := response.RegisterRespone {
@@ -53,25 +52,19 @@ func (uc *UserControllerImpl) Login(writer http.ResponseWriter, request *http.Re
 
 	errValidate := helper.CheckEmpty(login.Email, login.Password)
 	if errValidate != nil {
-		writer.Header().Set("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusBadRequest)
-		return
+		panic(exception.NewBadRequestError(errValidate.Error()))
 	}
 
 	user, errLogin := uc.UserService.Login(request.Context(), login)
 	if errLogin != nil {
-		writer.Header().Set("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusBadRequest)
-		return
+		panic(exception.NewBadRequestError(errLogin.Error()))
 	}
 
 	id := strconv.Itoa(user.ID)
 	
 	token, errToken := helper.GenerateToken(id)
 	if errToken != nil {
-		writer.Header().Set("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusBadRequest)
-		return
+		panic(exception.NewBadRequestError(errToken.Error()))
 	}
 
 	userToken := response.UserToken {
@@ -93,9 +86,7 @@ func (uc *UserControllerImpl) GetUserById(writer http.ResponseWriter, request *h
 
 	userId, err := uc.UserService.GetUserById(request.Context(), id)
 	if err != nil {
-		writer.Header().Set("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
+		panic(exception.NewBadRequestError(err.Error()))
 	}
 
 	userById := response.GetUserById {
@@ -124,8 +115,7 @@ func (uc *UserControllerImpl) Update(writer http.ResponseWriter, request *http.R
 
 	userUpdate, errUpdate := uc.UserService.Update(request.Context(), id, login)
 	if errUpdate != nil {
-		writer.Header().Set("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusInternalServerError)
+		panic(exception.NewBadRequestError(errUpdate.Error()))
 	}
 
 	newUserUpdate := response.UserUpdate {
@@ -151,11 +141,8 @@ func (uc *UserControllerImpl) Delete(writer http.ResponseWriter, request *http.R
 	id := strconv.Itoa(user.ID)
 
 	err := uc.UserService.Delete(request.Context(), id)
-
 	if err != nil {
-		writer.Header().Set("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusBadRequest)
-		return
+		panic(exception.NewBadRequestError(err.Error()))
 	}
 
 	userDelete := response.UserDelete {

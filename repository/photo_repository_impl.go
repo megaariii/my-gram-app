@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"fmt"
+	"my-gram/helper"
 	"my-gram/model/domain"
 )
 
@@ -17,11 +17,7 @@ func NewPhotoRepository() PhotoRepository {
 func (pr *PhotoRepositoryImpl) CreatePhoto(ctx context.Context, tx *sql.Tx, id string, photo domain.Photo) (*domain.Photo, error) {
 	SQL := "insert into photos(title, caption, photo_url, user_id, created_at) values($1, $2, $3, $4, now())"
 	_, errRow := tx.ExecContext(ctx, SQL, photo.Title, photo.Caption, photo.PhotoUrl, id)
-
-	if errRow != nil {
-		fmt.Println("Create Photo Repository Error: " + errRow.Error())
-		return nil, errRow
-	}
+	helper.PanicIfError(errRow)
 
 	return &photo, nil
 }
@@ -33,11 +29,7 @@ func (pr *PhotoRepositoryImpl) GetPhotos(tx *sql.Tx) ([]*domain.Photo, error) {
 	from photos p join users u 
 	on p.user_id = u.id
 	`)
-
-	if errRow != nil {
-		fmt.Println("Query Get Photo Error: " + errRow.Error())
-		return nil, errRow
-	}
+	helper.PanicIfError(errRow)
 
 	defer row.Close()
 	
@@ -48,11 +40,7 @@ func (pr *PhotoRepositoryImpl) GetPhotos(tx *sql.Tx) ([]*domain.Photo, error) {
 		err := row.Scan(
 			&photo.ID, &photo.Title, &photo.Caption, &photo.PhotoUrl, &photo.UserID, &photo.CreatedAt, &photo.User.Email, &photo.User.Username,
 		)
-
-		if err != nil {
-			fmt.Println("Get All Photo", err.Error())
-			return nil, err
-		}
+		helper.PanicIfError(err)
 
 		photos = append(photos, &photo)
 	}
@@ -66,10 +54,7 @@ func (pr *PhotoRepositoryImpl) GetPhotoById(ctx context.Context, tx *sql.Tx, id 
 	SQL := "select id, title, caption, photo_url, user_id from photos where id = $1"
 	row := tx.QueryRowContext(ctx, SQL, id)
 	err := row.Scan(&photo.ID, &photo.Title, &photo.Caption, &photo.PhotoUrl, &photo.UserID)
-	if err != nil {
-		fmt.Println("Get Photo By ID", err.Error())
-			return nil, err
-	}
+	helper.PanicIfError(err)
 
 	return &photo, nil
 }
@@ -77,25 +62,15 @@ func (pr *PhotoRepositoryImpl) GetPhotoById(ctx context.Context, tx *sql.Tx, id 
 func (pr *PhotoRepositoryImpl) UpdatePhoto(ctx context.Context, tx *sql.Tx, id string, photo domain.Photo) (*domain.Photo, error) {
 	SQL := "update photos set title = $1, caption = $2, photo_url = $3, updated_at = now() where id = $4"
 	_, errRow := tx.ExecContext(ctx, SQL, photo.Title, photo.Caption, photo.PhotoUrl, id)
-
-	if errRow != nil {
-		fmt.Println("Query Update Photo Error", errRow.Error())
-		return nil, errRow
-	}
+	helper.PanicIfError(errRow)
 
 	return &photo, nil
-
 }
 
 func (pr *PhotoRepositoryImpl) DeletePhoto(ctx context.Context, tx *sql.Tx, id string) error {
 	SQL := "delete from photos where id = $1"
-
 	_, errRow := tx.ExecContext(ctx, SQL, id)
-
-	if errRow != nil {
-		fmt.Println("Query Delete Photo Error", errRow.Error())
-		return errRow
-	}
+	helper.PanicIfError(errRow)
 
 	return nil
 }

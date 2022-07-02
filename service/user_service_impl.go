@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"log"
+	"my-gram/exception"
 	"my-gram/helper"
 	"my-gram/model/domain"
 	"my-gram/repository"
@@ -51,10 +51,7 @@ func (us *UserServiceImpl) Register(ctx context.Context, user domain.User) (*dom
 	defer helper.CommitOrRollback(tx)
 
 	newUser, err := us.UserRepository.Register(ctx, tx, user)
-	if err != nil {
-		log.Fatal(err.Error())
-		return nil, err
-	}
+	helper.PanicIfError(err)
 	
 	return newUser, nil
 }
@@ -69,8 +66,7 @@ func (us *UserServiceImpl) Login(ctx context.Context, login domain.UserLogin) (*
 	
 	user, err := us.UserRepository.Login(ctx, tx, email)
 	if err != nil {
-		log.Fatal(err.Error())
-		return nil, err
+		panic(exception.NewNotFoundError(err.Error()))
 	}
 	
 	if !helper.ComparePass(password, user.Password) {
@@ -87,8 +83,7 @@ func (us *UserServiceImpl) GetUserById(ctx context.Context, id string) (*domain.
 
 	user, err := us.UserRepository.GetUserById(ctx, tx, id)
 	if err != nil {
-		log.Fatal(err.Error())
-		return nil, err
+		panic(exception.NewNotFoundError(err.Error()))
 	}
 
 	return user, nil
@@ -101,8 +96,7 @@ func (us *UserServiceImpl) Update(ctx context.Context, id string, user domain.Us
 
 	userId, errGetId := us.UserRepository.GetUserById(ctx, tx, id)
 	if errGetId != nil {
-		log.Fatalln(errGetId.Error())
-		return nil, errGetId
+		panic(exception.NewNotFoundError(errGetId.Error()))
 	}
 
 	userId.Email = user.Email
@@ -111,8 +105,7 @@ func (us *UserServiceImpl) Update(ctx context.Context, id string, user domain.Us
 
 	updatedUser, err := us.UserRepository.Update(ctx, *userId)
 	if err != nil {
-		log.Fatalln(err.Error())
-		return nil, err
+		panic(exception.NewNotFoundError(err.Error()))
 	}
 
 	return updatedUser, nil
@@ -125,8 +118,7 @@ func (us *UserServiceImpl) Delete(ctx context.Context, id string) error {
 
 	errDel := us.UserRepository.Delete(ctx, tx, id)
 	if errDel != nil {
-		log.Fatal(errDel.Error())
-		return errDel
+		panic(exception.NewNotFoundError(errDel.Error()))
 	}
 
 	return nil

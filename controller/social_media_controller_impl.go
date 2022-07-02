@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"my-gram/exception"
 	"my-gram/helper"
 	"my-gram/middleware"
 	"my-gram/model/domain"
@@ -30,11 +31,8 @@ func (smc *SocialMediaControllerImpl) CreateSocialMedia(writer http.ResponseWrit
 	helper.ReadFromRequestBody(request, &input)
 
 	newSm, errCreate := smc.SocialMediaService.CreateSocialMedia(request.Context(), id, input)
-
 	if errCreate != nil {
-		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusBadRequest)
-		return
+		panic(exception.NewBadRequestError(errCreate.Error()))
 	}
 
 	newSocialMedia := response.CreateSocialMediaRespone {
@@ -56,11 +54,8 @@ func (smc *SocialMediaControllerImpl) CreateSocialMedia(writer http.ResponseWrit
 
 func (smc *SocialMediaControllerImpl) GetAllSocialMedia(writer http.ResponseWriter, request *http.Request) {
 	socialMedias, errSocialMedias := smc.SocialMediaService.GetAllSocialMedia(request.Context())
-
 	if errSocialMedias != nil {
-		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusBadRequest)
-		return
+		panic(exception.NewBadRequestError(errSocialMedias.Error()))
 	}
 
 	var socialMediasResponse []map[string]interface{}
@@ -94,11 +89,8 @@ func (smc *SocialMediaControllerImpl) GetSocialMediaById(writer http.ResponseWri
 	id := params["id"]
 
 	getById, errById := smc.SocialMediaService.GetSocialMediaById(request.Context(), id)
-
 	if errById != nil {
-		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
+		panic(exception.NewBadRequestError(errById.Error()))
 	}
 
 	socialMediaById := response.GetSocialMediaByIdRespone {
@@ -127,11 +119,8 @@ func (smc *SocialMediaControllerImpl) UpdateSocialMedia(writer http.ResponseWrit
 	helper.ReadFromRequestBody(request, &input)
 
 	updateSm, errUpdateSosmed := smc.SocialMediaService.UpdateSocialMedia(request.Context(), id, input)
-
 	if errUpdateSosmed != nil {
-		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusBadRequest)
-		return
+		panic(exception.NewBadRequestError(errUpdateSosmed.Error()))
 	}
 
 	newSosialMedia := response.UpdateSocialMediaRespone {
@@ -156,11 +145,8 @@ func (smc *SocialMediaControllerImpl) DeleteSocialMedia(writer http.ResponseWrit
 	id := params["id"]
 
 	errDelete := smc.SocialMediaService.DeleteSocialMedia(request.Context(), id)
-
 	if errDelete != nil {
-		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusBadRequest)
-		return
+		panic(exception.NewBadRequestError(errDelete.Error()))
 	}
 
 	socialMediaDelete := response.DeleteSocialMediaRespone {

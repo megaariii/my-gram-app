@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"fmt"
+	"my-gram/helper"
 	"my-gram/model/domain"
 	"time"
 )
@@ -18,11 +18,7 @@ func NewCommentRepository() CommentRepository {
 func (cr *CommentRepositoryImpl) AddComment(ctx context.Context, tx *sql.Tx, id string, comment domain.Comment) (*domain.Comment, error) {
 	SQL := "INSERT INTO comments(message, photo_id, user_id, created_at) VALUES ($1, $2, $3, $4)"
 	_, errInsert := tx.ExecContext(ctx, SQL, comment.Message, comment.PhotoID, id, time.Now())
-
-	if errInsert != nil {
-		fmt.Println("Query Add Comment Repository Error: " + errInsert.Error())
-		return nil, errInsert
-	}
+	helper.PanicIfError(errInsert)
 
 	return &comment, nil
 }
@@ -35,11 +31,7 @@ func (cr *CommentRepositoryImpl) GetAllComment(ctx context.Context, tx *sql.Tx) 
 	LEFT JOIN users u on c.user_id = u.id`
 
 	row, errRow := tx.QueryContext(ctx, SQL)
-
-	if errRow != nil {
-		fmt.Println("Query Get All Comment Error", errRow.Error())
-		return nil, errRow
-	}
+	helper.PanicIfError(errRow)
 
 	defer row.Close()
 
@@ -56,11 +48,7 @@ func (cr *CommentRepositoryImpl) GetAllComment(ctx context.Context, tx *sql.Tx) 
 			&comment.User.Email,
 		)
 
-		if err != nil {
-			fmt.Println("Err Ccan Get All", err.Error())
-			return nil, err
-		}
-
+		helper.PanicIfError(err)
 		comments = append(comments, &comment)
 	}
 
@@ -72,19 +60,12 @@ func (cr *CommentRepositoryImpl) GetCommentById(ctx context.Context, tx *sql.Tx,
 
 	SQL := `SELECT id, message, photo_id, user_id FROM photos where id = $1`
 	row, errRow := tx.QueryContext(ctx, SQL, id)
-
-	if errRow != nil {
-		fmt.Println("Query Get Comment By Id Error", errRow)
-		return nil, errRow
-	}
+	helper.PanicIfError(errRow)
 
 	defer row.Close()
 
 	err := row.Scan(&comment.ID, &comment.Message, &comment.PhotoID, &comment.UserID)
-
-	if err != nil {
-		return nil, err
-	}
+	helper.PanicIfError(err)
 
 	return comment, nil
 }
@@ -92,13 +73,8 @@ func (cr *CommentRepositoryImpl) GetCommentById(ctx context.Context, tx *sql.Tx,
 
 func (cr *CommentRepositoryImpl) UpdateComment(ctx context.Context, tx *sql.Tx, id string, comment domain.Comment) (*domain.Comment, error) {
 	SQL := `UPDATE comments SET message = $1, updated_at = now() WHERE id = $2`
-
 	_, errRow := tx.ExecContext(ctx, SQL, comment.Message, id)
-
-	if errRow != nil {
-		fmt.Println("Query Update Comment Error", errRow)
-		return nil, errRow
-	}
+	helper.PanicIfError(errRow)
 
 	return &comment, nil
 }
@@ -106,11 +82,7 @@ func (cr *CommentRepositoryImpl) UpdateComment(ctx context.Context, tx *sql.Tx, 
 func (cr *CommentRepositoryImpl) DeleteComment(ctx context.Context, tx *sql.Tx, id string) error {
 	sqlQuery := `DELETE FROM comments WHERE id = $1`
 	_, errRow := tx.ExecContext(ctx, sqlQuery, id)
-
-	if errRow != nil {
-		fmt.Println("Query Delete Comment Error", errRow)
-		return errRow
-	}
+	helper.PanicIfError(errRow)
 
 	return nil
 }

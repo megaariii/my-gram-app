@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"my-gram/exception"
 	"my-gram/helper"
 	"my-gram/middleware"
 	"my-gram/model/domain"
@@ -30,11 +31,8 @@ func (cc *CommentControllerImpl) AddComment(writer http.ResponseWriter, request 
 	helper.ReadFromRequestBody(request, &input)
 
 	newComment, errCreate := cc.CommentService.AddComment(request.Context(), id, input)
-
 	if errCreate != nil {
-		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusBadRequest)
-		return
+		panic(exception.NewBadRequestError(errCreate.Error()))
 	}
 
 	createComment := response.CreateCommentRespone {
@@ -57,10 +55,7 @@ func (cc *CommentControllerImpl) AddComment(writer http.ResponseWriter, request 
 func (cc *CommentControllerImpl) GetAllComment(writer http.ResponseWriter, request *http.Request) {
 	commentAll, errGetAll := cc.CommentService.GetAllComment(request.Context())
 	if errGetAll != nil {
-		writer.Write([]byte(errGetAll.Error()))
-		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
+		panic(exception.NewBadRequestError(errGetAll.Error()))
 	}
 
 	webResponse := response.WebResponse{
@@ -76,12 +71,8 @@ func (cc *CommentControllerImpl) GetCommentById(writer http.ResponseWriter, requ
 	id := params["id"]
 
 	getById, errById := cc.CommentService.GetCommentById(request.Context(), id)
-	
 	if errById != nil {
-		writer.Write([]byte(errById.Error()))
-		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
+		panic(exception.NewBadRequestError(errById.Error()))
 	}
 
 	getCommentById := response.GetCommentByIdRespone {
@@ -110,11 +101,8 @@ func (cc *CommentControllerImpl) UpdateComment(writer http.ResponseWriter, reque
 	helper.ReadFromRequestBody(request, &input)
 
 	updatedComment, errUpdateComment := cc.CommentService.UpdateComment(request.Context(), id, input)
-
 	if errUpdateComment != nil {
-		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusBadRequest)
-		return
+		panic(exception.NewBadRequestError(errUpdateComment.Error()))
 	}
 
 	newComment := response.UpdateCommentRespone {
@@ -139,11 +127,8 @@ func (cc *CommentControllerImpl) DeleteComment(writer http.ResponseWriter, reque
 	id := params["id"]
 
 	errDelete := cc.CommentService.DeleteComment(request.Context(), id)
-
 	if errDelete != nil {
-		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusBadRequest)
-		return
+		panic(exception.NewBadRequestError(errDelete.Error()))
 	}
 
 	commentDelete := response.DeleteCommentRespone {

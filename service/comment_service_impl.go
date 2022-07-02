@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"log"
+	"my-gram/exception"
 	"my-gram/helper"
 	"my-gram/model/domain"
 	"my-gram/repository"
@@ -32,11 +32,7 @@ func (cs *CommentServiceImpl) AddComment(ctx context.Context, id string, comment
 	defer helper.CommitOrRollback(tx)
 
 	newComment, errCreate := cs.CommentRepository.AddComment(ctx, tx, id, comment)
-
-	if errCreate != nil {
-		log.Fatal(err.Error())
-		return nil, err
-	}
+	helper.PanicIfError(errCreate)
 
 	return newComment, nil
 }
@@ -47,11 +43,7 @@ func (cs *CommentServiceImpl) GetAllComment(ctx context.Context) ([]*domain.Comm
 	defer helper.CommitOrRollback(tx)
 
 	allComment, errGetAll := cs.CommentRepository.GetAllComment(ctx, tx)
-
-	if errGetAll != nil {
-		log.Fatal(err.Error())
-		return nil, errGetAll
-	}
+	helper.PanicIfError(errGetAll)
 
 	return allComment, nil
 }
@@ -62,12 +54,10 @@ func (cs *CommentServiceImpl) GetCommentById(ctx context.Context, id string) (*d
 	defer helper.CommitOrRollback(tx)
 
 	getById, errGetById := cs.CommentRepository.GetCommentById(ctx, tx, id)
-
 	if errGetById != nil {
-		log.Fatal(err.Error())
-		return nil, errGetById
+		panic(exception.NewNotFoundError(errGetById.Error()))
 	}
-
+	
 	return getById, nil
 
 }
@@ -86,11 +76,10 @@ func (cs *CommentServiceImpl) UpdateComment(ctx context.Context, id string, inpu
 	comment.Message = input.Message
 
 	updateComment, errUpdate := cs.CommentRepository.UpdateComment(ctx, tx ,id, comment)
-
 	if errUpdate != nil {
-		log.Fatal(err.Error())
-		return nil, errUpdate
+		panic(exception.NewNotFoundError(errUpdate.Error()))
 	}
+	
 
 	return updateComment, nil
 }
@@ -101,10 +90,8 @@ func (cs *CommentServiceImpl) DeleteComment(ctx context.Context, id string) erro
 	defer helper.CommitOrRollback(tx)
 	
 	errDelete := cs.CommentRepository.DeleteComment(ctx, tx, id)
-
 	if errDelete != nil {
-		log.Fatal(err.Error())
-		return errDelete
+		panic(exception.NewNotFoundError(errDelete.Error()))
 	}
 
 	return nil

@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"my-gram/exception"
 	"my-gram/helper"
 	"my-gram/middleware"
 	"my-gram/model/domain"
@@ -30,11 +31,8 @@ func (pc *PhotoControllerImpl) CreatePhoto(writer http.ResponseWriter, request *
 	helper.ReadFromRequestBody(request, &photo)
 
 	newPhoto, errCreate := pc.PhotoService.CreatePhoto(request.Context(), id, photo)
-
 	if errCreate != nil {
-		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusBadRequest)
-		return
+		panic(exception.NewBadRequestError(errCreate.Error()))
 	}
 
 	createPhotoResponso := response.CreatePhotoRespone {
@@ -57,12 +55,7 @@ func (pc *PhotoControllerImpl) CreatePhoto(writer http.ResponseWriter, request *
 
 func (pc *PhotoControllerImpl) GetPhotos(writer http.ResponseWriter, request *http.Request) {
 	photos, err := pc.PhotoService.GetPhotos()
-	if err != nil {
-		writer.Write([]byte(err.Error()))
-		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+	helper.PanicIfError(err)
 
 	webResponse := response.WebResponse{
 		Code:   200,
@@ -78,11 +71,8 @@ func (pc *PhotoControllerImpl) GetPhotoById(writer http.ResponseWriter, request 
 	id := params["id"]
 
 	photoId, errGetById := pc.PhotoService.GetPhotoById(request.Context(), id)
-
 	if errGetById != nil {
-		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusBadRequest)
-		return
+		panic(exception.NewBadRequestError(errGetById.Error()))
 	}
 
 	photoById := response.GetPhotoByIdRespone {
@@ -112,11 +102,8 @@ func (pc *PhotoControllerImpl) UpdatePhoto(writer http.ResponseWriter, request *
 	helper.ReadFromRequestBody(request, &photo)
 
 	updatedPhoto, errUpdate := pc.PhotoService.UpdatePhoto(request.Context(), id, photo)
-
 	if errUpdate != nil {
-		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusBadRequest)
-		return
+		panic(exception.NewBadRequestError(errUpdate.Error()))
 	}
 
 	newPhoto := response.UpdatePhotoRespone {
@@ -142,11 +129,8 @@ func (pc *PhotoControllerImpl) DeletePhoto(writer http.ResponseWriter, request *
 	id := params["id"]
 
 	err := pc.PhotoService.DeletePhoto(request.Context(), id)
-
 	if err != nil {
-		writer.Header().Add("Content-Type", "application/json")
-		writer.WriteHeader(http.StatusBadRequest)
-		return
+		panic(exception.NewBadRequestError(err.Error()))
 	}
 
 	photoDelete := response.PhotoDelete {
