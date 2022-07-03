@@ -23,9 +23,13 @@ func (ur *UserRepositoryImpl) Register(ctx context.Context, tx *sql.Tx, user dom
 	user.Password = pass
 
 	SQL := "INSERT INTO users (username, email, password, age, created_at) VALUES ($1, $2, $3, $4, now()) RETURNING id"
-	_, err := tx.ExecContext(ctx, SQL, user.Username, user.Email, user.Password, user.Age)
+	result, err := tx.ExecContext(ctx, SQL, user.Username, user.Email, user.Password, user.Age)
 	helper.PanicIfError(err)
 
+	id, err := result.RowsAffected()
+	helper.PanicIfError(err)
+
+	user.ID = int(id)
 	return &user, nil
 }
 
