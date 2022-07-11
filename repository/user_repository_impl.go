@@ -21,11 +21,11 @@ func (ur *UserRepositoryImpl) Register(ctx context.Context, tx *sql.Tx, user dom
 	helper.PanicIfError(errHash)
 	user.Password = pass
 
-	SQL := "INSERT INTO users (username, email, password, age, created_at) VALUES ($1, $2, $3, $4, now()) RETURNING id"
+	SQL := "INSERT INTO users (username, email, password, age, created_at) VALUES (?, ?, ?, ?, now())"
 	result, err := tx.ExecContext(ctx, SQL, user.Username, user.Email, user.Password, user.Age)
 	helper.PanicIfError(err)
 
-	id, err := result.RowsAffected()
+	id, err := result.LastInsertId()
 	helper.PanicIfError(err)
 
 	user.ID = int(id)
@@ -33,7 +33,7 @@ func (ur *UserRepositoryImpl) Register(ctx context.Context, tx *sql.Tx, user dom
 }
 
 func (ur *UserRepositoryImpl) Login(ctx context.Context, tx *sql.Tx, email string) (*domain.User, error) {
-	SQL := "SELECT id, username, email, password, age FROM users WHERE email = $1"
+	SQL := "SELECT id, username, email, password, age FROM users WHERE email = ?"
 	rows, err := tx.QueryContext(ctx, SQL, email)
 	helper.PanicIfError(err)
 
@@ -48,7 +48,7 @@ func (ur *UserRepositoryImpl) Login(ctx context.Context, tx *sql.Tx, email strin
 }
 
 func (ur *UserRepositoryImpl) GetUserById(ctx context.Context, tx *sql.Tx, id string) (*domain.User, error) {
-	SQL := "SELECT id, username, email, password, age FROM users WHERE id = $1"
+	SQL := "SELECT id, username, email, password, age FROM users WHERE id = ?"
 	rows, err := tx.QueryContext(ctx, SQL, id)
 	helper.PanicIfError(err)
 
@@ -63,15 +63,20 @@ func (ur *UserRepositoryImpl) GetUserById(ctx context.Context, tx *sql.Tx, id st
 }
 
 func (ur *UserRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, user domain.User) (*domain.User, error) {
-	SQL := `UPDATE users SET email = $1, username = $2, updated_at = $3 WHERE id = $4`
-	_, errRow := tx.ExecContext(ctx, SQL, user.Email, user.Username, time.Now(), user.ID)
+	SQL := `UPDATE users SET email = ?, username = ?, updated_at = ? WHERE id = ?`
+	result, errRow := tx.ExecContext(ctx, SQL, user.Email, user.Username, time.Now(), user.ID)
 	helper.PanicIfError(errRow)
+
+	id, err := result.LastInsertId()
+	helper.PanicIfError(err)
+
+	user.ID = int(id)
 
 	return &user, nil
 }
 
 func (ur *UserRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, id string) error {
-	SQL := "DELETE FROM users WHERE id = $1"
+	SQL := "DELETE FROM users WHERE id = ?"
 	_, err := tx.ExecContext(ctx, SQL, id)
 	helper.PanicIfError(err)
 	
