@@ -2,18 +2,20 @@ package app
 
 import (
 	"database/sql"
+	"fmt"
+	"my-gram/helper"
+	"time"
 )
 
-var (
-	Db  *sql.DB
-	Err error
-)
+func NewDB() *sql.DB  {
+	db, err := sql.Open("mysql", "root:admin@tcp(localhost:3306)/mygramdb")
+	helper.PanicIfError(err)
 
-type Config struct {
-	Db_Host        	string `env:"DB_ADDRESS"`
-	Db_Port        	int    `env:"DB_PORT"`
-	Db_Username     string `env:"DB_USERNAME"`
-	Db_Password    	string `env:"DB_PASSWORD"`
-	Db_Dbname      	string `env:"DB_NAME"`
-	PORT           	int    `env:"_PORT"`
+	db.SetMaxIdleConns(5)
+	db.SetMaxOpenConns(20)
+	db.SetConnMaxLifetime(60 * time.Minute)
+	db.SetConnMaxIdleTime(10 * time.Minute)
+
+	fmt.Println("Successfully Connect to Database")
+	return db
 }

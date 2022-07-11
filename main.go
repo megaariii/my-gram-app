@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"my-gram/app"
@@ -14,42 +13,23 @@ import (
 	"net/http"
 	"time"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
-	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/julienschmidt/httprouter"
-	_ "github.com/lib/pq"
 )
 
-var cfg app.Config
-
 func main() {
-	_ = cleanenv.ReadConfig(".env", &cfg)
-	app.Db, app.Err = sql.Open("postgres", ConnectDbPsql(
-		cfg.Db_Host,
-		cfg.Db_Dbname,
-		cfg.Db_Username,
-		cfg.Db_Password,
-		cfg.Db_Port,
-	))
-	defer app.Db.Close()
-	if app.Err != nil {
-		panic(app.Err)
-	}
-	app.Err = app.Db.Ping()
-	if app.Err != nil {
-		panic(app.Err)
-	}
-	fmt.Println("Successfully Connect to Database")
+	db := app.NewDB()
 
 	userRepository := repository.NewUserRepository()
 	photoRepository := repository.NewPhotoRepository()
 	commentRepository := repository.NewCommentRepository()
 	socialMediaRepository := repository.NewSocialMediaRepository()
 
-	userService := service.NewUserService(userRepository, app.Db)
-	photoService := service.NewPhotoService(photoRepository, commentRepository, app.Db)
-	commentService := service.NewCommentService(commentRepository, app.Db)
-	socialMediaService := service.NewSocialMediaService(socialMediaRepository, app.Db)
+	userService := service.NewUserService(userRepository, db)
+	photoService := service.NewPhotoService(photoRepository, commentRepository, db)
+	commentService := service.NewCommentService(commentRepository, db)
+	socialMediaService := service.NewSocialMediaService(socialMediaRepository, db)
 
 	userController := controller.NewUserController(userService)
 	photoController := controller.NewPhotoController(photoService)
@@ -79,16 +59,4 @@ func main() {
 
 	log.Fatal(srv.ListenAndServe())
 
-}
-
-func ConnectDbPsql(host, user, password, dbname string, port int) string {
-	_ = cleanenv.ReadConfig(".env", &cfg)
-	psqlInfo := fmt.Sprintf("host= %s port= %d user= %s "+
-		" password= %s dbname= %s sslmode=disable",
-		cfg.Db_Host,
-		cfg.Db_Port,
-		cfg.Db_Username,
-		cfg.Db_Password,
-		cfg.Db_Dbname)
-	return psqlInfo
 }

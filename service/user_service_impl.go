@@ -103,7 +103,7 @@ func (us *UserServiceImpl) Update(ctx context.Context, id string, user domain.Us
 	userId.Username = user.Username
 	userId.UpdatedAt = time.Now()
 
-	updatedUser, err := us.UserRepository.Update(ctx, *userId)
+	updatedUser, err := us.UserRepository.Update(ctx, tx, *userId)
 	if err != nil {
 		panic(exception.NewNotFoundError(err.Error()))
 	}

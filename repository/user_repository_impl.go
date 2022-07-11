@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"my-gram/app"
 	"my-gram/helper"
 	"my-gram/model/domain"
 	"time"
@@ -63,9 +62,9 @@ func (ur *UserRepositoryImpl) GetUserById(ctx context.Context, tx *sql.Tx, id st
 	}
 }
 
-func (ur *UserRepositoryImpl) Update(ctx context.Context, user domain.User) (*domain.User, error) {
+func (ur *UserRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, user domain.User) (*domain.User, error) {
 	SQL := `UPDATE users SET email = $1, username = $2, updated_at = $3 WHERE id = $4`
-	_, errRow := app.Db.Exec(SQL, user.Email, user.Username, time.Now(), user.ID)
+	_, errRow := tx.ExecContext(ctx, SQL, user.Email, user.Username, time.Now(), user.ID)
 	helper.PanicIfError(errRow)
 
 	return &user, nil
