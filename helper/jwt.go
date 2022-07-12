@@ -2,7 +2,6 @@ package helper
 
 import (
 	"errors"
-	"log"
 	"os"
 	"time"
 
@@ -17,7 +16,7 @@ func GenerateToken(userId string) (string, error) {
 	signedToken, err := token.SignedString([]byte(os.Getenv("SECRET_KEY")))
 
 	if err != nil {
-		log.Fatal("Error in Generating key")
+		PanicIfError(errors.New("error in Generating key"))
 		return signedToken, err
 	}
 

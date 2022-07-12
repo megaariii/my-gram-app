@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"my-gram/exception"
 	"my-gram/helper"
 	"my-gram/middleware"
 	"my-gram/model/domain"
@@ -26,9 +25,7 @@ func (uc *UserControllerImpl) Register(writer http.ResponseWriter, request *http
 	helper.ReadFromRequestBody(request, &user)
 
 	newRegister, errRegister := uc.UserService.Register(request.Context(), user)
-	if errRegister != nil {
-		panic(exception.NewBadRequestError(errRegister.Error()))
-	}
+	helper.PanicIfError(errRegister)
 
 	registerRespone := response.RegisterRespone {
 		User_id:  newRegister.ID,
@@ -51,21 +48,15 @@ func (uc *UserControllerImpl) Login(writer http.ResponseWriter, request *http.Re
 	helper.ReadFromRequestBody(request, &login)
 
 	errValidate := helper.CheckEmpty(login.Email, login.Password)
-	if errValidate != nil {
-		panic(exception.NewBadRequestError(errValidate.Error()))
-	}
+	helper.PanicIfError(errValidate)
 
 	user, errLogin := uc.UserService.Login(request.Context(), login)
-	if errLogin != nil {
-		panic(exception.NewBadRequestError(errLogin.Error()))
-	}
+	helper.PanicIfError(errLogin)
 
 	id := strconv.Itoa(user.ID)
 	
 	token, errToken := helper.GenerateToken(id)
-	if errToken != nil {
-		panic(exception.NewBadRequestError(errToken.Error()))
-	}
+	helper.PanicIfError(errToken)
 
 	userToken := response.UserToken {
 		Token: token,
@@ -85,9 +76,7 @@ func (uc *UserControllerImpl) GetUserById(writer http.ResponseWriter, request *h
 	id := strconv.Itoa(user.ID)
 
 	userId, err := uc.UserService.GetUserById(request.Context(), id)
-	if err != nil {
-		panic(exception.NewBadRequestError(err.Error()))
-	}
+	helper.PanicIfError(err)
 
 	userById := response.GetUserById {
 		ID: userId.ID,
@@ -114,9 +103,7 @@ func (uc *UserControllerImpl) Update(writer http.ResponseWriter, request *http.R
 	id := strconv.Itoa(user.ID)
 
 	userUpdate, errUpdate := uc.UserService.Update(request.Context(), id, login)
-	if errUpdate != nil {
-		panic(exception.NewBadRequestError(errUpdate.Error()))
-	}
+	helper.PanicIfError(errUpdate)
 
 	newUserUpdate := response.UserUpdate {
 		ID: 		userUpdate.ID,
@@ -141,9 +128,7 @@ func (uc *UserControllerImpl) Delete(writer http.ResponseWriter, request *http.R
 	id := strconv.Itoa(user.ID)
 
 	err := uc.UserService.Delete(request.Context(), id)
-	if err != nil {
-		panic(exception.NewBadRequestError(err.Error()))
-	}
+	helper.PanicIfError(err)
 
 	userDelete := response.UserDelete {
 		Message: "Your account has been successfully deleted",

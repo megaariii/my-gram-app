@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"my-gram/exception"
 	"my-gram/helper"
 	"my-gram/model/domain"
 	"my-gram/repository"
@@ -65,9 +64,7 @@ func (smr *SocialMediaServiceImpl) GetSocialMediaById(ctx context.Context, id st
 	defer helper.CommitOrRollback(tx)
 
 	getSmById, errGetById := smr.SocialMediaRepository.GetSocialMediaById(ctx, tx, id)
-	if errGetById != nil {
-		panic(exception.NewNotFoundError(errGetById.Error()))
-	}
+	helper.PanicIfError(errGetById)
 
 	return getSmById, nil
 }
@@ -90,9 +87,7 @@ func (smr *SocialMediaServiceImpl) UpdateSocialMedia(ctx context.Context, id str
 	socialMedia.SocialMediaUrl = sm.SocialMediaUrl
 
 	updateSm, err := smr.SocialMediaRepository.UpdateSocialMedia(ctx, tx, id, socialMedia)
-	if err != nil {
-		panic(exception.NewNotFoundError(err.Error()))
-	}
+	helper.PanicIfError(err)
 
 
 	return updateSm, nil
@@ -104,9 +99,7 @@ func (smr *SocialMediaServiceImpl) DeleteSocialMedia(ctx context.Context, id str
 	defer helper.CommitOrRollback(tx)
 
 	errDelete := smr.SocialMediaRepository.DeleteSocialMedia(ctx, tx, id)
-	if errDelete != nil {
-		panic(exception.NewNotFoundError(errDelete.Error()))
-	}
+	helper.PanicIfError(errDelete)
 
 	return nil
 }

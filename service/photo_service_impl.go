@@ -4,8 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"log"
-	"my-gram/exception"
 	"my-gram/helper"
 	"my-gram/model/domain"
 	"my-gram/repository"
@@ -50,10 +48,7 @@ func (ps *PhotoServiceImpl) GetPhotos() ([]*domain.Photo, error) {
 
 	allPhotos, errGet := ps.PhotoRepository.GetPhotos(tx)
 
-	if errGet != nil {
-		log.Fatal(err.Error())
-		return nil, err
-	}
+	helper.PanicIfError(errGet)
 
 	return allPhotos, nil
 }
@@ -64,9 +59,7 @@ func (ps *PhotoServiceImpl) GetPhotoById(ctx context.Context, id string) (*domai
 	defer helper.CommitOrRollback(tx)
 
 	photoById, errGetById := ps.PhotoRepository.GetPhotoById(ctx, tx, id)
-	if errGetById != nil {
-		panic(exception.NewNotFoundError(errGetById.Error()))
-	}
+	helper.PanicIfError(errGetById)
 
 	return photoById, nil
 }
@@ -84,9 +77,7 @@ func (ps *PhotoServiceImpl) UpdatePhoto(ctx context.Context, id string, photo do
 	defer helper.CommitOrRollback(tx)
 
 	updatedPhoto, errUpdate := ps.PhotoRepository.UpdatePhoto(ctx, tx, id, photo)
-	if errUpdate != nil {
-		panic(exception.NewNotFoundError(errUpdate.Error()))
-	}
+	helper.PanicIfError(errUpdate)
 
 
 	return updatedPhoto, nil
@@ -98,10 +89,7 @@ func (ps *PhotoServiceImpl) DeletePhoto(ctx context.Context, id string) error {
 	defer helper.CommitOrRollback(tx)
 	
 	errDelete := ps.PhotoRepository.DeletePhoto(ctx, tx, id)
-	if errDelete != nil {
-		panic(exception.NewNotFoundError(errDelete.Error()))
-	}
-
+	helper.PanicIfError(errDelete)
 
 	return nil
 }

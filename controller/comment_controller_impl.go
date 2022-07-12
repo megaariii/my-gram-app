@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"my-gram/exception"
 	"my-gram/helper"
 	"my-gram/middleware"
 	"my-gram/model/domain"
@@ -31,9 +30,7 @@ func (cc *CommentControllerImpl) AddComment(writer http.ResponseWriter, request 
 	helper.ReadFromRequestBody(request, &input)
 
 	newComment, errCreate := cc.CommentService.AddComment(request.Context(), id, input)
-	if errCreate != nil {
-		panic(exception.NewBadRequestError(errCreate.Error()))
-	}
+	helper.PanicIfError(errCreate)
 
 	createComment := response.CreateCommentRespone {
 		ID: newComment.ID,
@@ -54,9 +51,7 @@ func (cc *CommentControllerImpl) AddComment(writer http.ResponseWriter, request 
 
 func (cc *CommentControllerImpl) GetAllComment(writer http.ResponseWriter, request *http.Request) {
 	commentAll, errGetAll := cc.CommentService.GetAllComment(request.Context())
-	if errGetAll != nil {
-		panic(exception.NewBadRequestError(errGetAll.Error()))
-	}
+	helper.PanicIfError(errGetAll)
 
 	webResponse := response.WebResponse{
 		Code:   http.StatusOK,
@@ -71,9 +66,7 @@ func (cc *CommentControllerImpl) GetCommentById(writer http.ResponseWriter, requ
 	id := params["id"]
 
 	getById, errById := cc.CommentService.GetCommentById(request.Context(), id)
-	if errById != nil {
-		panic(exception.NewBadRequestError(errById.Error()))
-	}
+	helper.PanicIfError(errById)
 
 	getCommentById := response.GetCommentByIdRespone {
 		ID: getById.ID,
@@ -101,9 +94,7 @@ func (cc *CommentControllerImpl) UpdateComment(writer http.ResponseWriter, reque
 	helper.ReadFromRequestBody(request, &input)
 
 	updatedComment, errUpdateComment := cc.CommentService.UpdateComment(request.Context(), id, input)
-	if errUpdateComment != nil {
-		panic(exception.NewBadRequestError(errUpdateComment.Error()))
-	}
+	helper.PanicIfError(errUpdateComment)
 
 	newComment := response.UpdateCommentRespone {
 		ID: updatedComment.ID,
@@ -127,9 +118,7 @@ func (cc *CommentControllerImpl) DeleteComment(writer http.ResponseWriter, reque
 	id := params["id"]
 
 	errDelete := cc.CommentService.DeleteComment(request.Context(), id)
-	if errDelete != nil {
-		panic(exception.NewBadRequestError(errDelete.Error()))
-	}
+	helper.PanicIfError(errDelete)
 
 	commentDelete := response.DeleteCommentRespone {
 		Message: "Your comment has been successfully deleted",

@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"my-gram/app"
 	"my-gram/controller"
 	"my-gram/exception"
+	"my-gram/helper"
 	"my-gram/middleware"
 	"my-gram/repository"
 	"my-gram/router"
@@ -57,6 +57,7 @@ func main() {
 
 	fmt.Println("Listening on port -> 127.0.0.1:8080")
 
-	log.Fatal(srv.ListenAndServe())
+	// log.Fatal(srv.ListenAndServe())
+	helper.PanicIfError(srv.ListenAndServe())
 
 }

@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"my-gram/exception"
 	"my-gram/helper"
 	"my-gram/middleware"
 	"my-gram/model/domain"
@@ -31,9 +30,7 @@ func (pc *PhotoControllerImpl) CreatePhoto(writer http.ResponseWriter, request *
 	helper.ReadFromRequestBody(request, &photo)
 
 	newPhoto, errCreate := pc.PhotoService.CreatePhoto(request.Context(), id, photo)
-	if errCreate != nil {
-		panic(exception.NewBadRequestError(errCreate.Error()))
-	}
+	helper.PanicIfError(errCreate)
 
 	createPhotoResponso := response.CreatePhotoRespone {
 		ID:  newPhoto.ID,
@@ -71,9 +68,7 @@ func (pc *PhotoControllerImpl) GetPhotoById(writer http.ResponseWriter, request 
 	id := params["id"]
 
 	photoId, errGetById := pc.PhotoService.GetPhotoById(request.Context(), id)
-	if errGetById != nil {
-		panic(exception.NewBadRequestError(errGetById.Error()))
-	}
+	helper.PanicIfError(errGetById)
 
 	photoById := response.GetPhotoByIdRespone {
 		ID: photoId.ID,
@@ -102,9 +97,7 @@ func (pc *PhotoControllerImpl) UpdatePhoto(writer http.ResponseWriter, request *
 	helper.ReadFromRequestBody(request, &photo)
 
 	updatedPhoto, errUpdate := pc.PhotoService.UpdatePhoto(request.Context(), id, photo)
-	if errUpdate != nil {
-		panic(exception.NewBadRequestError(errUpdate.Error()))
-	}
+	helper.PanicIfError(errUpdate)
 
 	newPhoto := response.UpdatePhotoRespone {
 		ID: updatedPhoto.ID,
@@ -129,9 +122,7 @@ func (pc *PhotoControllerImpl) DeletePhoto(writer http.ResponseWriter, request *
 	id := params["id"]
 
 	err := pc.PhotoService.DeletePhoto(request.Context(), id)
-	if err != nil {
-		panic(exception.NewBadRequestError(err.Error()))
-	}
+	helper.PanicIfError(err)
 
 	photoDelete := response.PhotoDelete {
 		Message: "Your photo has been successfully deleted",

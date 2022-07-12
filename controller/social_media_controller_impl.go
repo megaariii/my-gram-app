@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"my-gram/exception"
 	"my-gram/helper"
 	"my-gram/middleware"
 	"my-gram/model/domain"
@@ -31,9 +30,7 @@ func (smc *SocialMediaControllerImpl) CreateSocialMedia(writer http.ResponseWrit
 	helper.ReadFromRequestBody(request, &input)
 
 	newSm, errCreate := smc.SocialMediaService.CreateSocialMedia(request.Context(), id, input)
-	if errCreate != nil {
-		panic(exception.NewBadRequestError(errCreate.Error()))
-	}
+	helper.PanicIfError(errCreate)
 
 	newSocialMedia := response.CreateSocialMediaRespone {
 		ID: newSm.ID,
@@ -54,9 +51,7 @@ func (smc *SocialMediaControllerImpl) CreateSocialMedia(writer http.ResponseWrit
 
 func (smc *SocialMediaControllerImpl) GetAllSocialMedia(writer http.ResponseWriter, request *http.Request) {
 	socialMedias, errSocialMedias := smc.SocialMediaService.GetAllSocialMedia(request.Context())
-	if errSocialMedias != nil {
-		panic(exception.NewBadRequestError(errSocialMedias.Error()))
-	}
+	helper.PanicIfError(errSocialMedias)
 
 	var socialMediasResponse []map[string]interface{}
 
@@ -89,9 +84,7 @@ func (smc *SocialMediaControllerImpl) GetSocialMediaById(writer http.ResponseWri
 	id := params["id"]
 
 	getById, errById := smc.SocialMediaService.GetSocialMediaById(request.Context(), id)
-	if errById != nil {
-		panic(exception.NewBadRequestError(errById.Error()))
-	}
+	helper.PanicIfError(errById)
 
 	socialMediaById := response.GetSocialMediaByIdRespone {
 		ID: getById.ID,
@@ -119,9 +112,7 @@ func (smc *SocialMediaControllerImpl) UpdateSocialMedia(writer http.ResponseWrit
 	helper.ReadFromRequestBody(request, &input)
 
 	updateSm, errUpdateSosmed := smc.SocialMediaService.UpdateSocialMedia(request.Context(), id, input)
-	if errUpdateSosmed != nil {
-		panic(exception.NewBadRequestError(errUpdateSosmed.Error()))
-	}
+	helper.PanicIfError(errUpdateSosmed)
 
 	newSosialMedia := response.UpdateSocialMediaRespone {
 		ID: updateSm.ID,
@@ -145,9 +136,7 @@ func (smc *SocialMediaControllerImpl) DeleteSocialMedia(writer http.ResponseWrit
 	id := params["id"]
 
 	errDelete := smc.SocialMediaService.DeleteSocialMedia(request.Context(), id)
-	if errDelete != nil {
-		panic(exception.NewBadRequestError(errDelete.Error()))
-	}
+	helper.PanicIfError(errDelete)
 
 	socialMediaDelete := response.DeleteSocialMediaRespone {
 		Message: "Your Social Media has been successfully deleted",

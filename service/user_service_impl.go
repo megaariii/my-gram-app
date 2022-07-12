@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"my-gram/exception"
 	"my-gram/helper"
 	"my-gram/model/domain"
 	"my-gram/repository"
@@ -65,9 +64,7 @@ func (us *UserServiceImpl) Login(ctx context.Context, login domain.UserLogin) (*
 	defer helper.CommitOrRollback(tx)
 	
 	user, err := us.UserRepository.Login(ctx, tx, email)
-	if err != nil {
-		panic(exception.NewNotFoundError(err.Error()))
-	}
+	helper.PanicIfError(err)
 	
 	if !helper.ComparePass(password, user.Password) {
 		return nil, errors.New("password must be correct")
@@ -82,10 +79,7 @@ func (us *UserServiceImpl) GetUserById(ctx context.Context, id string) (*domain.
 	defer helper.CommitOrRollback(tx)
 
 	user, err := us.UserRepository.GetUserById(ctx, tx, id)
-	if err != nil {
-		panic(exception.NewNotFoundError(err.Error()))
-	}
-
+	helper.PanicIfError(err)
 	return user, nil
 }
 
@@ -95,18 +89,14 @@ func (us *UserServiceImpl) Update(ctx context.Context, id string, user domain.Us
 	defer helper.CommitOrRollback(tx)
 
 	userId, errGetId := us.UserRepository.GetUserById(ctx, tx, id)
-	if errGetId != nil {
-		panic(exception.NewNotFoundError(errGetId.Error()))
-	}
+	helper.PanicIfError(errGetId)
 
 	userId.Email = user.Email
 	userId.Username = user.Username
 	userId.UpdatedAt = time.Now()
 
 	updatedUser, err := us.UserRepository.Update(ctx, tx, *userId)
-	if err != nil {
-		panic(exception.NewNotFoundError(err.Error()))
-	}
+	helper.PanicIfError(err)
 
 	return updatedUser, nil
 }
@@ -117,9 +107,7 @@ func (us *UserServiceImpl) Delete(ctx context.Context, id string) error {
 	defer helper.CommitOrRollback(tx)
 
 	errDel := us.UserRepository.Delete(ctx, tx, id)
-	if errDel != nil {
-		panic(exception.NewNotFoundError(errDel.Error()))
-	}
+	helper.PanicIfError(errDel)
 
 	return nil
 }
